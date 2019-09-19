@@ -9,6 +9,7 @@ class Client
     {
         this.username = undefined;
         this.rank = undefined;
+        this.connection = client;
     }
 
     ConnectToServer(ip, port, sendNotification)
@@ -20,7 +21,7 @@ class Client
 
         client.on("connect", () => {
             //this.WriteToServer("Connecte !");
-          //  return "connected";
+            //sendNotification("Connecté au serveur");
         });
 
         client.on("data", (data) => {
@@ -41,6 +42,8 @@ class Client
     AuthenticateUser(user)
     {
         var md5Pass = encryptToMD5(user.password);
+        var jsonRequest = JSON.stringify(["AuthenticationRequest", user.username, md5Pass]);
+        this.WriteToServer(jsonRequest);
     }
 
     WriteToServer(message)

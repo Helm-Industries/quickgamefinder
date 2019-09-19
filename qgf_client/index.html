@@ -48,6 +48,7 @@
         <div class="mdl-snackbar__text"></div>
         <button class="mdl-snackbar__action" type="button"></button>
       </div>
+      <a href="index.html">refresh</a>
     </div>
 
     <!-- You can also require other files to run in this process -->
@@ -59,10 +60,11 @@
 
       var username = document.getElementById('userusername');
       var userpass = document.getElementById('userpassword');
-      var user = new User();
-
+      var user = new User(username.value, userpass.value);
       loginButton.addEventListener('click', () => {
-        user.login(username.value, userpass.value, sendNotification, "Connexion en cours...");
+        user.username = username.value;
+        user.password = userpass.value;
+        user.login(sendNotification, "Connexion en cours...");
       });
     </script>
   </body>

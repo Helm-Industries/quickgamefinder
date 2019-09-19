@@ -1,26 +1,22 @@
 class User
 {
-    constructor()
+    constructor(username, password)
     {
-        this.username = null;
-        this.password = null;
+        this.username = username;
+        this.password = password;
     }
 
-    login(username, password, sendNotification, notifContent)
+    login(sendNotification, notifContent)
     {
-        if(username.toString().length < 3)
+        if (this.username.length < 3 || this.password.length < 3)
         {
-            if (sendNotification != null) {
-                sendNotification("Nom de compte ou mot de passe incorrect");
-            }
-        }
-        else if (password.toString().length < 3) {
             if (sendNotification != null) {
                 sendNotification("Nom de compte ou mot de passe incorrect");
             }
         }
         else
         {
+
             //login phase
             if (sendNotification != null)
             {
@@ -31,22 +27,19 @@ class User
     }
 }
 
+var networkStreamExists = false;
+
 function initLogin(user, sendNotification)
 {
     const NetworkClient = require("./client.js").client;
-    let client = new NetworkClient();
-    var connectionState = client.ConnectToServer("78.114.52.238", 5000, sendNotification);
-    console.log(connectionState);
-    switch(connectionState)
-    {
-        case "connected": 
-            sendNotification("Connecté au serveur");
-            client.AuthenticateUser(user);
-            break;
-        default: 
-            break;
-    }
-
+    let client;
+    if(networkStreamExists == false)
+        client = new NetworkClient();
+    networkStreamExists = true;
+    client.ConnectToServer("78.114.52.238", 5000, sendNotification);
+    client.connection.on("connect", () => {
+        client.AuthenticateUser(user);
+    });    
 }
 
 module.exports.user = User;
