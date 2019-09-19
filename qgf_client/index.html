@@ -3,77 +3,68 @@
   <head>
     <meta charset="UTF-8">
     <title>QuickGameFinder - Connexion</title>
-    <link rel="stylesheet" href="./css/index.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <!--CSS-->
+    <link rel="stylesheet" href="./css/index/index.css">
+    <link id="login" rel="stylesheet" href="./css/index/login.css">
+
+    <!--THEME-->
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-blue.min.css">
     <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+
+    <!--ICONS-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <!--FONTS-->
     <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Manjari&display=swap" rel="stylesheet">
+
   </head>
   <body>
     <div class="content">
+
       <a href="">
         <img class="logo" src="" alt="">
       </a>
-        <div class="mainPanel">
-          <div class="panelContent">
-            <div class="panelTopPart">
-              <h3 class="panelTitle">Connexion</h3>
-              <p class="panelDesc">Connectez vous à l'aide de votre compte.</p>
-            </div>
-            <div class="panelCenterPart">
-              <form class="loginForm" action="">
-                <div class="textInputContainer">
-                  <p class="inputTitle">Nom D'utilisateur</p>
-                  <div class="textInput">
-                    <img src="./imgs/login-rounded-right.png" alt="">
-                    <input id="userusername" type="text">
-                  </div>
-                </div>
-                <div class="textInputContainer">
-                  <p class="inputTitle">Mot de passe</p>
-                  <div class="textInput">
-                    <img src="./imgs/password.png" alt="">
-                    <input id="userpassword" type="password">
-                  </div>
-                </div>
-                <div class="forgetPasswordText">
-                  <p><a href="">Tu as oublié ton mot de passe ?</a></p>
-                  
-                </div>
-              <button id="loginSubmit" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-                  Se Connecter
-              </button>
-              </form>
-              <div class="signupText">
-                <p>Besoin d'un compte ?<a href=""> Inscrit Toi</a></p>
-       
-              </div>
-            </div>
-          </div>
-        </div>
+
+      <!--CONTENU DE LA PAGE-->
+      <div id="bodyContent">
+        
+      </div>
+
+      <!--NOTIFICATIONS-->
       <div id="toastHandler" class="mdl-js-snackbar mdl-snackbar">
         <div class="mdl-snackbar__text"></div>
         <button class="mdl-snackbar__action" type="button"></button>
       </div>
+
+      <!--TEMPORAIRE-->
       <a href="index.html">refresh</a>
     </div>
 
     <!-- You can also require other files to run in this process -->
     <script src="renderer.js"></script>
+  
+    <!--CUSTOM JAVASCRIPT-->
+    <script>window.$ = window.jQuery = require('jquery');</script>
+    <script src="js_tools/changePage.js"></script>
     <script>
-      const sendNotification = require("./io/sendNotif.js").sendStateNotification;
-      const User = require("./networking/user.js").user;
-      const loginButton = document.querySelector('#loginSubmit');
+      $(document).ready(function () {
+        if(currentPage == "login")
+        {
+          const sendNotification = require("./io/sendNotif.js").sendStateNotification;
+          const User = require("./networking/user.js").user;
+          const loginButton = document.querySelector('#loginSubmit');
 
-      var username = document.getElementById('userusername');
-      var userpass = document.getElementById('userpassword');
-      var user = new User(username.value, userpass.value);
-      loginButton.addEventListener('click', () => {
-        user.username = username.value;
-        user.password = userpass.value;
-        user.login(sendNotification, "Connexion en cours...");
+          var username = document.getElementById('userusername');
+          var userpass = document.getElementById('userpassword');
+          var user = new User(username.value, userpass.value);
+          loginButton.addEventListener('click', () => {
+            user.username = username.value;
+            user.password = userpass.value;
+            user.login(sendNotification, "Connexion en cours...");
+          });
+        }
       });
     </script>
   </body>
