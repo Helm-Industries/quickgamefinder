@@ -48,7 +48,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 400px;
+    height: 250px;
 }
 
 .loginForm
@@ -94,8 +94,9 @@
 
 .inputTitle
 {
-    margin-bottom: 4px;
+    margin-bottom: 0px;
     font-size: 16;
+    margin-top:10px;
 }
 
 .textInput
