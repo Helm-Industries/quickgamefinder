@@ -10,9 +10,8 @@ function changeCurrentPage(nextPage)
         $("#bodyContent").empty();
         $("#bodyContent").load("./html/index/" + nextPage + ".html");
         $("#" + currentPage).attr("href", "./css/index/" + nextPage + ".css");
-        $("#" + currentPage).attr("id" , currentPage);
+        $("#" + currentPage).attr("id" , nextPage);
         currentPage = nextPage;
     });
     $("#bodyContent").fadeIn();
-
 }
