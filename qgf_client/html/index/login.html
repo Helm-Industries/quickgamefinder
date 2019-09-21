@@ -41,7 +41,6 @@
 
 <script>
     $(document).ready(function () {
-        if (currentPage == "login") {
             const sendNotification = require("./io/sendNotif.js").sendStateNotification;
             const User = require("./networking/user.js").user;
             const loginButton = document.querySelector('#loginSubmit');
@@ -54,6 +53,5 @@
                 user.password = userpass.value;
                 user.login(sendNotification, "Connexion en cours...");
             });
-        }
     });
 </script>

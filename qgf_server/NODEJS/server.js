@@ -41,9 +41,14 @@ function handleData(data, socket)
         {
             case "AuthenticationRequest"://username md5password
                 if(tab.length == 3)
-                    AuthenticateUser(tab[1], tab[2], socket); 
+                    authenticateUser(tab[1], tab[2], socket); 
                 break;
-            default: 
+            case "RegisterRequest": //email username pass
+                if(tab.length == 4)    
+                    registerUser(tab[1], tab[2], tab[3], socket);
+                break;
+                
+            default:
                 sendWrongQuery(socket);
                 break;
         }
@@ -52,15 +57,19 @@ function handleData(data, socket)
 
 function sendWrongQuery(socket)
 {
-    writeSocket(["Erreur lors de l'interpretation de la requete"], socket);
+    writeSocket(["PacketInterpretationFail","Erreur lors de l'interpretation de la requete"], socket);
 }
 
 function writeSocket(data, socket)
 {
-    socket.write(JSON.stringify(data));
+    try {
+        socket.write(JSON.stringify(data));
+    } catch (error) {
+        console.log(error);
+    }  
 }
 
-function FindUser(username)
+function findUser(username)
 {
     var toreturn = null;
     clients.forEach((element) => {
@@ -71,7 +80,7 @@ function FindUser(username)
     return toreturn;
 }
 
-function RemoveUser(username)
+function removeUser(username)
 {
     for (var i = 0; i < clients.length; i++) { 
         if(clients[i].data["username"] == username)
@@ -82,7 +91,7 @@ function RemoveUser(username)
     } 
 }
 
-function AuthenticateUser(username, password, socket)
+function authenticateUser(username, password, socket)
 {
     db.queryDB("SELECT * FROM users WHERE username='" + username + "' AND password='" + password + "'", function(err, data)
     {
@@ -101,11 +110,11 @@ function AuthenticateUser(username, password, socket)
                 else
                 {
                     var user = new User(socket, data, "connected");
-                    var userfound = FindUser(data["username"]);
+                    var userfound = findUser(data["username"]);
                     if(userfound != null)
                     {
                         userfound.socket.write(JSON.stringify(["DoubleConnectRequest", "Quelqu'un s'est connecté a votre compte."])); // Déconnecte l'utilisateur si double connexion a son compte;
-                        RemoveUser(data["username"]);
+                        removeUser(data["username"]);
                         clients.push(user);
                     }
                     clients.push(user);
@@ -119,17 +128,26 @@ function AuthenticateUser(username, password, socket)
     });
 }
 
-function registerUser(username, password, email, socket)
+function registerUser(email, username, password, socket)
 {
     db.queryDB("SELECT * FROM users WHERE email='"+ email +"'", function(err, data)
     {
         if(data.length == 0)
         {
-
+            db.queryDB("SELECT * FROM users WHERE username='" + username + "'", function(err, data){
+                if(data.length == 0)
+                {
+                    db.queryDB("INSERT INTO users(username, email, password, rank, ban) VALUES('" + username + "', '" + email +"', '" + password + "', 'free', 0)", function(err, data){
+                        if(err) console.log(err);
+                    });
+                    console.log("Utilisateur " + username + " inscrit !");
+                    writeSocket(["RegistrationSuccess", "Inscription réussie, vous pouvez maintenant vous connecter."], socket);
+                }
+                else
+                    writeSocket(["RegistrationUsernameTaken", "Ce nom d'utilisateur existe déjà"], socket);
+            });
         }
         else
-        {
-            
-        }
+            writeSocket(["RegistrationEmailTaken", "Cet email existe déjà"], socket);
     });
 }

@@ -1,3 +1,6 @@
+var networkStreamExists = false;
+let client;
+const NetworkClient = require("./client.js").client;
 
 class User
 {
@@ -26,15 +29,31 @@ class User
             initLogin(this, sendNotification);
         }
     }
+
+    register(sendNotification, data) //mail, username, pass
+    {
+        initRegister(sendNotification, data);
+    }
 }
 
-var networkStreamExists = false;
-let client;
+function initRegister(sendNotification, data)
+{
+    if(data.length == 3)
+    {
+        if (networkStreamExists == false) 
+        {
+            client = new NetworkClient();
+            client.ConnectToServer("78.114.52.238", 5000, sendNotification);
+            client.RegisterUser(data);
+            networkStreamExists = true;
+        }
+        else
+            client.RegisterUser(data);
+    }
+}
 
 function initLogin(user, sendNotification)
 {
-    console.log("Init login");
-    const NetworkClient = require("./client.js").client;
     if(networkStreamExists == false)
     {
         client = new NetworkClient();
@@ -42,11 +61,8 @@ function initLogin(user, sendNotification)
         client.AuthenticateUser(user);
     }
     else
-    {
         client.AuthenticateUser(user);
-    }
     networkStreamExists = true;
-
 }
 
 module.exports.user = User;

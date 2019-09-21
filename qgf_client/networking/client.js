@@ -56,6 +56,19 @@ class Client
             case "DoubleConnectRequest":
                 sendNotification("Vous avez été déconnecté: " + data[1]);
                 break;
+            case "RegistrationSuccess":
+                sendNotification(data[1]);
+                break;
+            case "RegistrationUsernameTaken":
+                sendNotification("Erreur lors de l'inscription: " + data[1]);
+                break;
+            case "RegistrationEmailTaken":
+                sendNotification("Erreur lors de l'inscription: " + data[1]);
+                break;
+            case "PacketInterpretationFail": 
+                sendNotification("Echec de l'interpretation du packet");
+                console.log(data[1]);
+                break;
             default:
                 sendNotification("Echec de l'interpretation du packet");
                 console.log("Echec de l'interpretation du packet : " + data[0]);
@@ -67,6 +80,17 @@ class Client
     {
         var md5Pass = encryptToMD5(user.password);
         var jsonRequest = JSON.stringify(["AuthenticationRequest", user.username, md5Pass]);
+        this.WriteToServer(jsonRequest);
+    }
+
+    RegisterUser(data)
+    {
+        console.log(data);
+        var email = data[0];
+        var username = data[1];
+        var pass = data[2];
+        var md5Pass = encryptToMD5(pass);
+        var jsonRequest = JSON.stringify(["RegisterRequest", email, username, md5Pass]);
         this.WriteToServer(jsonRequest);
     }
 

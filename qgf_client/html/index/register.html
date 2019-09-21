@@ -10,14 +10,14 @@
                     <p class="inputTitle">Nom D'utilisateur</p>
                     <div class="textInput">
                         <img src="./imgs/login-rounded-right.png" alt="">
-                        <input id="userpassword" type="text">
+                        <input id="userusername" type="text">
                     </div>
                 </div>
                     <div class="textInputContainer">
                     <p class="inputTitle">E-Mail</p>
                     <div class="textInput">
                         <img src="./imgs/mail.png" alt="">
-                        <input id="userpassword" type="text">
+                        <input id="useremail" type="text">
                         </div>
                     </div>
                 <div class="textInputContainer">
@@ -28,10 +28,10 @@
                     </div>
                 </div>
                 <div class="textInputContainer">
-                    <p class="inputTitle">Comfirmer votre mot de passe</p>
+                    <p class="inputTitle">Confirmer votre mot de passe</p>
                     <div class="textInput">
                         <img src="./imgs/password.png" alt="">
-                        <input id="userpassword" type="password">
+                        <input id="userconfirmpassword" type="password">
                     </div>
                 </div>
                 <button id="registerSubmit" type="button"
@@ -42,8 +42,41 @@
             <div class="signupText">
                 <p>Déjà un compte ?<a id="registerPageButton" href="#" onclick="changeCurrentPage('login')">
                         Connexion</a></p>
-
             </div>
         </div>
     </div>
 </div>
+
+<script>
+        $(document).ready(function () {
+            const sendNotification = require("./io/sendNotif.js").sendStateNotification;
+            const User = require("./networking/user.js").user;
+            const registerButton = document.getElementById('registerSubmit');
+
+            var useremail = document.getElementById("useremail");
+            var username = document.getElementById('userusername');
+            var userpass = document.getElementById('userpassword');
+            var conf = document.getElementById("userconfirmpassword");
+            
+            registerButton.addEventListener("click", () => {
+                if (userpass.value == conf.value) {
+                    if (userpass.value.length >= 3) {
+                        if (username.value.length >= 3) {
+                            if (useremail.value.includes("@")) {
+                                var user = new User(username.value, userpass.value);
+                                user.register(sendNotification, [useremail.value, username.value, userpass.value]);
+                            }
+                            else
+                                sendNotification("L'email n'existe pas !");
+                        }
+                        else
+                            sendNotification("Le nom d'utilisateur est trop court !");
+                    }
+                    else
+                        sendNotification("Le mot de passe est trop court !");
+                }
+                else
+                    sendNotification("Les mots de passe ne correspondent pas");
+            })
+        });
+</script>
