@@ -7,7 +7,7 @@ const User = require("./IO/user").User;
 var clients = [];
 var db = null;
 
-server.listen(port, () => {
+server.listen({ port: 5000, host: "localhost"}, () => {
     console.log("Server ready");
     db = new Database("mysql-quickgamefinder.alwaysdata.net", "189919", "quickgamefinder_dev", "Yujilaosyalere94");
 });
