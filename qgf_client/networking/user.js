@@ -43,7 +43,7 @@ function initRegister(sendNotification, data)
         if (networkStreamExists == false) 
         {
             client = new NetworkClient();
-            client.ConnectToServer("78.114.52.238", 5000, sendNotification);
+            client.ConnectToServer("85.168.78.41", 5000, sendNotification);
             client.RegisterUser(data);
             networkStreamExists = true;
         }
@@ -57,7 +57,7 @@ function initLogin(user, sendNotification)
     if(networkStreamExists == false)
     {
         client = new NetworkClient();
-        client.ConnectToServer("78.114.52.238", 5000, sendNotification);
+        client.ConnectToServer("85.168.78.41", 5000, sendNotification);
         client.AuthenticateUser(user);
     }
     else

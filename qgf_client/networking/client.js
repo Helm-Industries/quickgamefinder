@@ -85,7 +85,6 @@ class Client
 
     RegisterUser(data)
     {
-        console.log(data);
         var email = data[0];
         var username = data[1];
         var pass = data[2];
