@@ -25,7 +25,8 @@ class Client
         });
 
         client.on("data", (data) => {
-            console.log("Data from server: " + data);
+            console.log(JSON.parse(data));
+            this.HandleData(JSON.parse(data), sendNotification);
         });
 
         client.on("end", () => {
@@ -39,6 +40,29 @@ class Client
         });
     }
     
+    HandleData(data, sendNotification)
+    {
+        var requestID = data[0];
+        var length = data.length;
+        switch(requestID)
+        {
+            case "LoginSuccess":
+                sendNotification("Connecté ! Bienvenue, " + data[1]);
+                this.rank = data[2];
+                break;
+            case "LoginFailed":
+                sendNotification("Echec de la connexion: " + data[1]);
+                break;
+            case "DoubleConnectRequest":
+                sendNotification("Vous avez été déconnecté: " + data[1]);
+                break;
+            default:
+                sendNotification("Echec de l'interpretation du packet");
+                console.log("Echec de l'interpretation du packet : " + data[0]);
+                break;
+        }
+    }
+
     AuthenticateUser(user)
     {
         var md5Pass = encryptToMD5(user.password);

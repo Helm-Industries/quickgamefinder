@@ -48,24 +48,5 @@
     <!--CUSTOM JAVASCRIPT-->
     <script>window.$ = window.jQuery = require('jquery');</script>
     <script src="js_tools/changePage.js"></script>
-    <script>
-      $(document).ready(function () {
-        if(currentPage == "login")
-        {
-          const sendNotification = require("./io/sendNotif.js").sendStateNotification;
-          const User = require("./networking/user.js").user;
-          const loginButton = document.querySelector('#loginSubmit');
-
-          var username = document.getElementById('userusername');
-          var userpass = document.getElementById('userpassword');
-          var user = new User(username.value, userpass.value);
-          loginButton.addEventListener('click', () => {
-            user.username = username.value;
-            user.password = userpass.value;
-            user.login(sendNotification, "Connexion en cours...");
-          });
-        }
-      });
-    </script>
   </body>
 </html>

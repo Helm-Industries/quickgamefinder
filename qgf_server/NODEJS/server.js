@@ -1,28 +1,20 @@
 var net = require("net");
-var mysql = require("mysql");
 const port = 5000;
 const server = new net.Server();
+const Database = require("./database/db").Database;
+const User = require("./IO/user").User;
+
 var clients = [];
-var con = mysql.createConnection({
-    host: "mysql-quickgamefinder.alwaysdata.net",
-    user: "189919",
-    database:"quickgamefinder_dev",
-    password: "Yujilaosyalere94"
-});
+var db = null;
 
 server.listen(port, () => {
     console.log("Server ready");
-
-    con.connect(function (err) {
-        if (err) throw err;
-        console.log("Connected to DB");
-    });
+    db = new Database("mysql-quickgamefinder.alwaysdata.net", "189919", "quickgamefinder_dev", "Yujilaosyalere94");
 });
 
 server.on('connection', function (socket) {
     console.log('A new connection has been established.');
     socket.setEncoding('utf8')
-    clients.push(socket);
     //socket.write('Hello, client.');
     // The server can also receive data from the client by reading from its socket.
     socket.on('data', function (chunk) {
@@ -47,9 +39,9 @@ function handleData(data, socket)
         var requestID = tab[0];
         switch(requestID)
         {
-            case "AuthenticationRequest":
+            case "AuthenticationRequest"://username md5password
                 if(tab.length == 3)
-                    AuthenticateUser(tab[1], tab[2], socket);
+                    AuthenticateUser(tab[1], tab[2], socket); 
                 break;
             default: 
                 sendWrongQuery(socket);
@@ -60,7 +52,7 @@ function handleData(data, socket)
 
 function sendWrongQuery(socket)
 {
-    socket.write("Erreur lors de l'interpretation de la requete");
+    writeSocket(["Erreur lors de l'interpretation de la requete"], socket);
 }
 
 function writeSocket(data, socket)
@@ -68,9 +60,31 @@ function writeSocket(data, socket)
     socket.write(JSON.stringify(data));
 }
 
+function FindUser(username)
+{
+    var toreturn = null;
+    clients.forEach((element) => {
+        if (element.data["username"] == username) {
+            toreturn = element;
+        }
+    });
+    return toreturn;
+}
+
+function RemoveUser(username)
+{
+    for (var i = 0; i < clients.length; i++) { 
+        if(clients[i].data["username"] == username)
+        {
+            clients.splice(i, 1);
+            break;
+        }
+    } 
+}
+
 function AuthenticateUser(username, password, socket)
 {
-    queryDB("SELECT * FROM users WHERE username='" + username + "' AND password='" + password + "'", function(err, data)
+    db.queryDB("SELECT * FROM users WHERE username='" + username + "' AND password='" + password + "'", function(err, data)
     {
         if(err)
         {
@@ -81,16 +95,41 @@ function AuthenticateUser(username, password, socket)
         {
             if(data.length == 1)
             {
-                socket.write("authenticationSuccess");
+                data = data[0]; // RowDataPacket content
+                if(data["ban"] > 0)
+                    writeSocket(["LoginFailed", "Vous avez été banni"], socket);
+                else
+                {
+                    var user = new User(socket, data, "connected");
+                    var userfound = FindUser(data["username"]);
+                    if(userfound != null)
+                    {
+                        userfound.socket.write(JSON.stringify(["DoubleConnectRequest", "Quelqu'un s'est connecté a votre compte."])); // Déconnecte l'utilisateur si double connexion a son compte;
+                        RemoveUser(data["username"]);
+                        clients.push(user);
+                    }
+                    clients.push(user);
+                    console.log("Connexion de " + data["username"]);
+                    writeSocket(["LoginSuccess", data["username"], data["rank"]], socket);
+                }
             }
+            else
+                writeSocket(["LoginFailed", "Nom de compte ou mot de passe incorrect"], socket);
         }
     });
 }
 
-function queryDB(query, callback)
+function registerUser(username, password, email, socket)
 {
-    var queryresult = con.query(query, function (err, result) {
-        if (err) callback(err, null);
-        else callback(null, result);
+    db.queryDB("SELECT * FROM users WHERE email='"+ email +"'", function(err, data)
+    {
+        if(data.length == 0)
+        {
+
+        }
+        else
+        {
+            
+        }
     });
 }

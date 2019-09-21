@@ -1,3 +1,4 @@
+
 class User
 {
     constructor(username, password)
@@ -28,18 +29,24 @@ class User
 }
 
 var networkStreamExists = false;
+let client;
 
 function initLogin(user, sendNotification)
 {
+    console.log("Init login");
     const NetworkClient = require("./client.js").client;
-    let client;
     if(networkStreamExists == false)
+    {
         client = new NetworkClient();
-    networkStreamExists = true;
-    client.ConnectToServer("78.114.52.238", 5000, sendNotification);
-    client.connection.on("connect", () => {
+        client.ConnectToServer("78.114.52.238", 5000, sendNotification);
         client.AuthenticateUser(user);
-    });    
+    }
+    else
+    {
+        client.AuthenticateUser(user);
+    }
+    networkStreamExists = true;
+
 }
 
 module.exports.user = User;
