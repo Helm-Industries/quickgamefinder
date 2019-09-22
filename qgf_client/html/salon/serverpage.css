@@ -13,24 +13,46 @@ body{
     height:60px;
     width: 100%;
     background-color: #278DE6;
-
+    display: flex;
+    justify-content: space-between;   
 }
 
-.navul{
-    list-style-type: none;
-    display: flex; 
-    float: right;
+.leftNavBar
+{
+    width: 30%;
+    height: 100%;
 }
-.signUp{
-    margin-right: 50px;
+
+.rightNavBar
+{
+    display: flex;
+    width: 30%;
+    height: 100%;
+    justify-content: space-evenly;
+    align-items: center;
 }
-.navbar ul li a{
+.rightNavBar a{
     text-decoration: none;
-    color: #fff;
-    vertical-align: middle;
-    line-height: 60px;
-    padding-left: 50px;
+    color:white;
+    font-size: 18px;
+
 }
+
+.rightNavBar a::after{
+    content: '';
+    display: block;
+    width: 0;
+    height: 2px;
+    background: #fff;
+    transition: width .3s;
+}
+
+.rightNavBar a:hover::after{
+    width: 100%;
+    transition: width .3s;
+}
+
+
 
 .textInput{
     width:75%;
@@ -72,11 +94,16 @@ body{
     width: 20%;
     height: 870px;
     background-color: #071320;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
 }
 .leftPart p{
-    padding-bottom: 50px;
+    margin-bottom: 50px;
     color: #fff;
     text-align: center;
+    width:fit-content;
+
     
 }
 
