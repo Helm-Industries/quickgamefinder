@@ -13,18 +13,23 @@ body{
     height:60px;
     width: 100%;
     background-color: #278DE6;
-   
+
 }
 
 .navul{
     list-style-type: none;
     display: flex; 
+    float: right;
 }
-
+.signUp{
+    margin-right: 50px;
+}
 .navbar ul li a{
     text-decoration: none;
     color: #fff;
-    padding-left: 100px;
+    vertical-align: middle;
+    line-height: 60px;
+    padding-left: 50px;
 }
 
 .textInput{
