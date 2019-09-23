@@ -4,6 +4,7 @@ var client = new net.Socket();
 client.setEncoding('utf8');
 const changeCurrentPage = require("../js_tools/changePage").changeCurrentPage;
 const changeCurrentMainPage = require("../js_tools/changePage").changeCurrentMainPage;
+const isDevBuild = true;
 
 function sleep(ms){
     return new Promise(resolve=>{
@@ -22,7 +23,10 @@ class Client
 
     ConnectToServer(sendNotification)
     {
-        client.connect({host: "srv06.skoa.li", port: 10671});
+        if(isDevBuild)
+            client.connect({host: "127.0.0.1", port: 5000});
+        else
+            client.connect({host: "srv06.skoa.li", port: 10671});
 
         client.on("connect", () => {
             //this.WriteToServer("Connecte !");

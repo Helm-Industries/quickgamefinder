@@ -3,15 +3,30 @@ const port = 5000;
 const server = new net.Server();
 const Database = require("./database/db").Database;
 const User = require("./IO/user").User;
+const isDevBuild = true;
+const Room = require("./client/room/room").Room;
 
 var clients = [];
+var rooms = [];
+
 var db = null;
 
-server.listen(5000, "0.0.0.0", () => {
-    console.log("Server ready");
-    db = new Database("mysql-quickgamefinder.alwaysdata.net", "189919", "quickgamefinder_dev", "Yujilaosyalere94");
-});
+if(isDevBuild)
+{
+    server.listen(5000, "0.0.0.0", () => {
+        console.log("Server ready");
+        db = new Database("mysql-quickgamefinder.alwaysdata.net", "189919", "quickgamefinder_dev", "Yujilaosyalere94");
+    });    
+}
+else
+{
+    server.listen(10671, "0.0.0.0", () => {
+        console.log("Server ready");
+        db = new Database("mysql-quickgamefinder.alwaysdata.net", "189919", "quickgamefinder_dev", "Yujilaosyalere94");
+    });
+}
 
+//#region gestion serveur / packets
 server.on('connection', function (socket) {
     console.log('A new connection has been established.');
     socket.setEncoding('utf8')
@@ -68,6 +83,9 @@ function writeSocket(data, socket)
         console.log(error);
     }  
 }
+//#endregion
+
+//#region connexion_register
 
 function findUser(username)
 {
@@ -151,3 +169,67 @@ function registerUser(email, username, password, socket)
             writeSocket(["RegistrationEmailTaken", "Cet email existe déjà"], socket);
     });
 }
+
+//#endregion
+
+//#region rooms
+
+function findRoom(username)
+{
+    var toreturn = null;
+    rooms.forEach((room) => {
+        if(room.author.data["username"] == username)
+            toreturn = room;
+    });
+    return toreturn;
+}
+
+function removeRoom(username)
+{
+    for (var i = 0; i < rooms.length; i++) { 
+        if(rooms[i].author.data["username"] == username)
+        {
+            clients.splice(i, 1);
+            break;
+        }
+    } 
+}
+
+function destroyRoom(host) 
+{
+    var room = findRoom(host.data["username"]);
+    if(host.room != null)
+    {
+        console.log("Suppression du salon '" + host.room.name + "' (" + host.data["username"] + ")");
+        room.members.forEach((element) => {
+            if(element.data["username"] != room.author.data["username"])
+                writeSocket(["RoomClosing", "L'hôte du salon a fermé le serveur."], element.socket);
+            else
+                writeSocket(["RoomLeft", "Vous avez quitté le salon '" + room.name + "'"], element.socket);
+        });
+        removeRoom(host.data["username"]);
+        host.room = null;
+    }
+}
+
+function createRoom(user, parameters)
+{
+    if(user.room == null)
+    {
+        var room = new Room
+        (
+            user, 
+            parameters["room_name"], 
+            parameters["room_desc"],
+            parameters["room_max_players"],
+            parameters["room_game_id"]
+        );
+        room.initRoom();
+        rooms.push(room);
+        writeSocket(["RoomCreateSuccess", room, "Salon créé !"], user.socket);
+    }
+    else
+        writeSocket(["AlreadyInRoom", "Vous ne pouvez pas rejoindre 2 salons en même temps !"], user.socket);
+}
+
+//#endregion
