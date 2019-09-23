@@ -2,6 +2,14 @@ var net = require("net");
 var encryptToMD5 = require("../io/md5").encryptToMD5;
 var client = new net.Socket();
 client.setEncoding('utf8');
+const changeCurrentPage = require("../js_tools/changePage").changeCurrentPage;
+const changeCurrentMainPage = require("../js_tools/changePage").changeCurrentMainPage;
+
+function sleep(ms){
+    return new Promise(resolve=>{
+        setTimeout(resolve,ms)
+    })
+}
 
 class Client
 {
@@ -12,12 +20,9 @@ class Client
         this.connection = client;
     }
 
-    ConnectToServer(ip, port, sendNotification)
+    ConnectToServer(sendNotification)
     {
-        client.connect({
-            ip: ip,
-            port: port
-        });
+        client.connect({host: "srv06.skoa.li", port: 10671});
 
         client.on("connect", () => {
             //this.WriteToServer("Connecte !");
@@ -33,14 +38,15 @@ class Client
             sendNotification("Connexion perdue !");
         });
 
-        client.on("error", () => {
+        client.on("error", (err) => {
+            console.log(err);
             sendNotification("Impossible de se connecter au serveur");
             client.end();
             return "connectionFailed";
         });
     }
     
-    HandleData(data, sendNotification)
+    async HandleData(data, sendNotification)
     {
         var requestID = data[0];
         var length = data.length;
@@ -49,15 +55,19 @@ class Client
             case "LoginSuccess":
                 sendNotification("Connecté ! Bienvenue, " + data[1]);
                 this.rank = data[2];
+                await sleep(3500);
+                changeCurrentMainPage("salon", "serverpage", "TITRE DU SALON");
                 break;
             case "LoginFailed":
                 sendNotification("Echec de la connexion: " + data[1]);
                 break;
             case "DoubleConnectRequest":
                 sendNotification("Vous avez été déconnecté: " + data[1]);
+                changeCurrentPage("index", "login");
                 break;
             case "RegistrationSuccess":
                 sendNotification(data[1]);
+                changeCurrentPage("index", "login");
                 break;
             case "RegistrationUsernameTaken":
                 sendNotification("Erreur lors de l'inscription: " + data[1]);
