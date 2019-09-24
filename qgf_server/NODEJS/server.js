@@ -184,6 +184,16 @@ function findRoom(username)
     return toreturn;
 }
 
+function findRoomByID(roomid)
+{
+    var toreturn = null;
+    rooms.forEach((room) => {
+        if(room.roomid == roomid)
+            toreturn = room;
+    });
+    return toreturn;
+}
+
 function removeRoom(username)
 {
     for (var i = 0; i < rooms.length; i++) { 
@@ -228,6 +238,34 @@ function createRoom(user, parameters)
         rooms.push(room);
         writeSocket(["RoomCreateSuccess", room, "Salon créé !"], user.socket);
     }
+    else
+        writeSocket(["AlreadyInRoom", "Vous ne pouvez pas rejoindre 2 salons en même temps !"], user.socket);
+}
+
+function writeToRoom(room, message)
+{
+    room.members.forEach(user => {
+        writeSocket(message, user.socket);
+    });
+}
+
+function joinRoom(user, roomid)
+{
+    if(user.room == null)
+    {
+        var room = findRoomByID(roomid);
+        if(room != null)
+        {
+            if(room.members.length < room.max_players)
+            {
+                //peut rejoindre le salon
+                writeToRoom(room, ["UserJoin", user, "L'utilisateur " + user.data["username"] + " a rejoint le salon"]);
+                writeSocket(["RoomJoinSuccess", room, "Salon rejoint"], user.socket);
+            }
+        }
+        else
+            writeSocket(["RoomDoesNotExit", "Impossible de rejoindre ce salon"]);
+    }  
     else
         writeSocket(["AlreadyInRoom", "Vous ne pouvez pas rejoindre 2 salons en même temps !"], user.socket);
 }
