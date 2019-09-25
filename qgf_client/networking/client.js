@@ -4,7 +4,7 @@ var client = new net.Socket();
 client.setEncoding('utf8');
 const changeCurrentPage = require("../js_tools/changePage").changeCurrentPage;
 const changeCurrentMainPage = require("../js_tools/changePage").changeCurrentMainPage;
-const isDevBuild = true;
+const isDevBuild = false;
 
 function sleep(ms){
     return new Promise(resolve=>{
